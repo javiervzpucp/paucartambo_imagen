@@ -1,13 +1,12 @@
 import os
 import streamlit as st
-from dotenv import load_dotenv
 import pandas as pd
 import openai
 from PIL import Image
 
 # Cargar las variables de entorno desde el archivo .env
-load_dotenv()
-openai.api_key = os.getenv("OPENAI_API_KEY")
+#load_dotenv()
+openai.api_key = st.secrets["OPENAI_API_KEY"]
 
 # Rutas de archivos CSV
 dataset_path = "imagenes/imagenes.csv"
@@ -37,7 +36,7 @@ def describe_image(img_url, title, example_descriptions):
     # Crear el prompt que incluye ejemplos previos como contexto
     prompt = f"{describe_system_prompt}\n\n{example_descriptions}\n\nGenera una descripción para la siguiente imagen:\nTítulo: {title}"
 
-    response = openai.ChatCompletion.create(
+    response = openai.chat.completions.create(
         model="gpt-4o-mini",
         messages=[
             {"role": "system", "content": describe_system_prompt},
