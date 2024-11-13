@@ -109,7 +109,7 @@ else:
             st.write(description)
             
             # Guardar la nueva descripción en el DataFrame y en el archivo CSV
-            new_df = new_df.append({"imagen": img_url, "descripción": title, "generated_description": description}, ignore_index=True)
+            new_df = new_df.append({"imagen": img_url, "descripcion": title, "generated_description": description}, ignore_index=True)
             new_df.to_csv(new_dataset_path, sep=';', index=False)
 
 # Mostrar el historial de descripciones generadas
