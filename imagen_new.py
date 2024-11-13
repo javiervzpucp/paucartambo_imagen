@@ -114,4 +114,4 @@ else:
 
 # Mostrar el historial de descripciones generadas
 st.write("Historial de descripciones generadas:")
-st.dataframe(new_df[["imagen", "descripción", "generated_description"]])
+st.dataframe(new_df[["imagen", "descripcion", "generated_description"]])
