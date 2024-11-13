@@ -37,7 +37,7 @@ def describe_image(img_url, title, example_descriptions):
     # Crear el prompt que incluye ejemplos previos como contexto
     prompt = f"{describe_system_prompt}\n\n{example_descriptions}\n\nGenera una descripción para la siguiente imagen:\nTítulo: {title}"
 
-    response = openai.chat.completions.create(
+    response = openai.ChatCompletion.create(
         model="gpt-4o-mini",
         messages=[
             {"role": "system", "content": describe_system_prompt},
