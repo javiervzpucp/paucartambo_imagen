@@ -63,7 +63,7 @@ def generate_and_store_descriptions(df, new_df):
     print(f"Descripciones generadas y guardadas en el archivo {new_dataset_path}.")
 
 # Inicializar la aplicación Streamlit
-st.title("Generador de Descripciones de Imágenes Culturales")
+st.title("Generador de Descripciones de Imágenes de las Devociones Marianas de Paucartambo")
 
 # Opción para ingresar una URL de imagen o cargar un archivo de imagen
 option = st.radio("Seleccione el método para proporcionar una imagen:", ("URL de imagen", "Subir imagen"))
