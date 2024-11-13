@@ -14,11 +14,11 @@ dataset_path = "imagenes/imagenes.csv"
 new_dataset_path = "imagenes/nuevas_descripciones.csv"
 
 # Cargar o inicializar los DataFrames
-df = pd.read_csv(dataset_path, delimiter=';')
+df = pd.read_csv(dataset_path, delimiter=';',encoding='latin-1')
 if os.path.exists(new_dataset_path):
     new_df = pd.read_csv(new_dataset_path, delimiter=';',encoding='latin-1')
 else:
-    new_df = pd.DataFrame(columns=["imagen", "descripción", "generated_description"])
+    new_df = pd.DataFrame(columns=["imagen", "descripcion", "generated_description"])
 
 # Prompt para generar descripciones concisas
 describe_system_prompt = '''
@@ -55,9 +55,9 @@ def generate_and_store_descriptions(df, new_df):
 
     for index, row in df.iterrows():
         img_url = row['imagen']
-        title = row['descripción']
+        title = row['descripcion']
         description = describe_image(img_url, title, example_descriptions)
-        new_df = new_df._append({"imagen": img_url, "descripción": title, "generated_description": description}, ignore_index=True)
+        new_df = new_df._append({"imagen": img_url, "descripcion": title, "generated_description": description}, ignore_index=True)
 
     new_df.to_csv(new_dataset_path, sep=';', index=False)
     print(f"Descripciones generadas y guardadas en el archivo {new_dataset_path}.")
@@ -85,7 +85,7 @@ if option == "URL de imagen":
             st.write(description)
             
             # Guardar la nueva descripción en el DataFrame y en el archivo CSV
-            new_df = new_df._append({"imagen": img_url, "descripción": title, "generated_description": description}, ignore_index=True)
+            new_df = new_df._append({"imagen": img_url, "descripcion": title, "generated_description": description}, ignore_index=True)
             new_df.to_csv(new_dataset_path, sep=';', index=False)
 
 else:
