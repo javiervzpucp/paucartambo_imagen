@@ -27,11 +27,11 @@ Eres un sistema especializado en generar descripciones breves y precisas para es
 '''
 
 # Prompt adicional para traducción al quechua
-translate_to_quechua_prompt = '''
-Traduce esta descripción al Quechua Cuzqueño. Si no conoces alguna palabra, escríbela en español. También eres un sistema especializado en generar descripciones breves y precisas para escenas culturales y eventos andinos, especialmente de la festividad de la Mamacha Carmen en Paucartambo. Describe de manera clara y objetiva la escena principal, destacando solo los elementos visibles y relevantes sin adornos adicionales. Mantente directo y conciso.
+#translate_to_quechua_prompt = '''
+#Traduce esta descripción al Quechua Cuzqueño. Si no conoces alguna palabra, escríbela en español. También eres un sistema especializado en generar descripciones breves y precisas para escenas culturales y eventos andinos, especialmente de la festividad de la Mamacha Carmen en Paucartambo. Describe de manera clara y objetiva la escena principal, destacando solo los elementos visibles y relevantes sin adornos adicionales. Mantente directo y conciso.
 
 
-'''
+#'''
 
 def get_combined_examples(df):
     # Verificar que la columna 'generated_description' existe en el DataFrame
@@ -61,19 +61,19 @@ def describe_image(img_url, title, example_descriptions):
     description = response.choices[0].message.content.strip()
 
     # Generar traducción al quechua
-    translation_prompt = f"{translate_to_quechua_prompt}\n\n{description}"
-    response_quechua = client.chat.completions.create(
-        model="gpt-4-turbo",
-        messages=[
-            {"role": "system", "content": translate_to_quechua_prompt},
-            {"role": "user", "content": translation_prompt}
-        ],
-        max_tokens=300,
-        temperature=0.2
-    )
-    description_quechua = response_quechua.choices[0].message.content.strip()
+    #translation_prompt = f"{translate_to_quechua_prompt}\n\n{description}"
+    #response_quechua = client.chat.completions.create(
+    #    model="gpt-4-turbo",
+    #    messages=[
+    #        {"role": "system", "content": translate_to_quechua_prompt},
+    #        {"role": "user", "content": translation_prompt}
+    #    ],
+    #    max_tokens=300,
+    #    temperature=0.2
+    #)
+    #description_quechua = response_quechua.choices[0].message.content.strip()
 
-    return description, description_quechua
+    return description#, description_quechua
 
 # Inicializar la aplicación Streamlit
 st.title("Generador de Descripciones de Imágenes de Danzas de Paucartambo en Español y Quechua")
@@ -100,7 +100,7 @@ if option == "URL de imagen":
             st.write(description_quechua)
             
             # Guardar la nueva descripción en el DataFrame y en el archivo CSV
-            new_df = new_df._append({"imagen": img_url, "descripcion": title, "generated_description": description, "generated_description_quechua": description_quechua}, ignore_index=True)
+            new_df = new_df._append({"imagen": img_url, "descripcion": title, "generated_description": description}, ignore_index=True)
             new_df.to_csv(new_dataset_path, sep=';', index=False,encoding='ISO-8859-1')
 
 else:
@@ -123,13 +123,13 @@ else:
             description, description_quechua = describe_image(img_url, title, example_descriptions)
             st.write("Descripción en español:")
             st.write(description)
-            st.write("Descripción en quechua:")
-            st.write(description_quechua)
+            #st.write("Descripción en quechua:")
+            #st.write(description_quechua)
             
             # Guardar la nueva descripción en el DataFrame y en el archivo CSV
-            new_df = new_df._append({"imagen": img_url, "descripcion": title, "generated_description": description, "generated_description_quechua": description_quechua}, ignore_index=True)
+            new_df = new_df._append({"imagen": img_url, "descripcion": title, "generated_description": description}, ignore_index=True)
             new_df.to_csv(new_dataset_path, sep=';', index=False,encoding='ISO-8859-1')
 
 # Mostrar el historial de descripciones generadas
 st.write("Historial de descripciones generadas:")
-st.dataframe(new_df[["imagen", "descripcion", "generated_description", "generated_description_quechua"]])
+st.dataframe(new_df[["imagen", "descripcion", "generated_description"]])
