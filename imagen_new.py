@@ -28,7 +28,8 @@ Eres un sistema especializado en generar descripciones breves y precisas para es
 
 # Prompt adicional para traducción al quechua
 translate_to_quechua_prompt = '''
-Traduce esta descripción a la lengua Quechua. Si no conoces alguna palabra, escríbela en español. 
+Traduce esta descripción a la lengua Quechua. Si no conoces alguna palabra, escríbela en español. También eres un sistema especializado en generar descripciones breves y precisas para escenas culturales y eventos andinos, especialmente de la festividad de la Mamacha Carmen en Paucartambo. Describe de manera clara y objetiva la escena principal, destacando solo los elementos visibles y relevantes sin adornos adicionales. Mantente directo y conciso.
+
 
 '''
 
