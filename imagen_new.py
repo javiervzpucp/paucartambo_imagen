@@ -76,7 +76,7 @@ def describe_image(img_url, title, example_descriptions):
     return description#, description_quechua
 
 # Inicializar la aplicación Streamlit
-st.title("Generador de Descripciones de Imágenes de Danzas de Paucartambo en Español y Quechua")
+st.title("Generador de Descripciones de Imágenes de Danzas de Paucartambo")
 
 # Opción para ingresar una URL de imagen o cargar un archivo de imagen
 option = st.radio("Seleccione el método para proporcionar una imagen:", ("URL de imagen", "Subir imagen"))
