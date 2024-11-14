@@ -28,7 +28,8 @@ Eres un sistema especializado en generar descripciones breves y precisas para es
 
 # Prompt adicional para traducción al quechua
 translate_to_quechua_prompt = '''
-Traduce la siguiente descripción al quechua:
+Eres un sistema especializado en generar descripciones en quechua que sean breves y precisas para escenas culturales y eventos andinos, especialmente de la festividad de la Mamacha Carmen en Paucartambo. Describe de manera clara y objetiva la escena principal, destacando solo los elementos visibles y relevantes sin adornos adicionales. Mantente directo y conciso.
+
 '''
 
 def get_combined_examples(df):
