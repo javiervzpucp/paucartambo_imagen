@@ -50,7 +50,7 @@ def describe_image(img_url, title, example_descriptions):
     prompt = f"{describe_system_prompt}\n\n{example_descriptions}\n\nGenera una descripción para la siguiente imagen:\nTítulo: {title}"
 
     response = client.chat.completions.create(
-        model="gpt-4o-mini",
+        model="gpt-4-turbo",
         messages=[
             {"role": "system", "content": describe_system_prompt},
             {"role": "user", "content": prompt}
