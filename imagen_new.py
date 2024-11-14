@@ -40,7 +40,7 @@ def get_combined_examples(df):
     combined_examples = "Ejemplos de descripciones previas:\n\n"
     for _, row in df.iterrows():
         if pd.notna(row.get('generated_description')) and pd.notna(row.get('descripcion')):
-            combined_examples += f"Título: {row['descripción']}\nDescripción: {row['generated_description']}\n\n"
+            combined_examples += f"Título: {row['descripcion']}\nDescripción: {row['generated_description']}\n\n"
     return combined_examples
 
 def describe_image(img_url, title, example_descriptions):
