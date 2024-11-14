@@ -63,13 +63,13 @@ def describe_image(img_url, title, example_descriptions):
     # Generar traducción al quechua
     translation_prompt = f"{translate_to_quechua_prompt}\n\n{description}"
     response_quechua = client.chat.completions.create(
-        model="gpt-4o-mini",
+        model="gpt-4-turbo",
         messages=[
             {"role": "system", "content": translate_to_quechua_prompt},
             {"role": "user", "content": translation_prompt}
         ],
         max_tokens=300,
-        temperature=0.5
+        temperature=0.2
     )
     description_quechua = response_quechua.choices[0].message.content.strip()
 
