@@ -99,7 +99,7 @@ if option == "URL de imagen":
             
             # Guardar la nueva descripción en el DataFrame y en el archivo CSV
             new_df = new_df._append({"imagen": img_url, "descripcion": title, "generated_description": description, "generated_description_quechua": description_quechua}, ignore_index=True)
-            new_df.to_csv(new_dataset_path, sep=';', index=False)
+            new_df.to_csv(new_dataset_path, sep=';', index=False,encoding='ISO-8859-1')
 
 else:
     uploaded_file = st.file_uploader("Cargue una imagen", type=["jpg", "jpeg", "png"])
@@ -126,7 +126,7 @@ else:
             
             # Guardar la nueva descripción en el DataFrame y en el archivo CSV
             new_df = new_df._append({"imagen": img_url, "descripcion": title, "generated_description": description, "generated_description_quechua": description_quechua}, ignore_index=True)
-            new_df.to_csv(new_dataset_path, sep=';', index=False)
+            new_df.to_csv(new_dataset_path, sep=';', index=False,encoding='ISO-8859-1')
 
 # Mostrar el historial de descripciones generadas
 st.write("Historial de descripciones generadas:")
