@@ -11,15 +11,15 @@ openai_api_key = os.getenv("OPENAI_API_KEY")
 client = OpenAI(api_key=openai_api_key)
 
 # Rutas de archivos CSV
-dataset_path = "imagenes.csv"
-new_dataset_path = "nuevas_descripciones.csv"
+dataset_path = "imagenes/imagenes.csv"
+new_dataset_path = "imagenes/nuevas_descripciones.csv"
 
 # Cargar o inicializar los DataFrames
-df = pd.read_csv(dataset_path, delimiter=';')
+df = pd.read_csv(dataset_path, delimiter=';',encoding='ISO-8859-1')
 if os.path.exists(new_dataset_path):
-    new_df = pd.read_csv(new_dataset_path, delimiter=';')
+    new_df = pd.read_csv(new_dataset_path, delimiter=';',encoding='ISO-8859-1')
 else:
-    new_df = pd.DataFrame(columns=["imagen", "descripción", "generated_description", "generated_description_quechua"])
+    new_df = pd.DataFrame(columns=["imagen", "descripcion", "generated_description", "generated_description_quechua"])
 
 # Prompt para generar descripciones concisas
 describe_system_prompt = '''
@@ -39,7 +39,7 @@ def get_combined_examples(df):
     # Generar un texto combinado de ejemplos a partir de descripciones previas
     combined_examples = "Ejemplos de descripciones previas:\n\n"
     for _, row in df.iterrows():
-        if pd.notna(row.get('generated_description')) and pd.notna(row.get('descripción')):
+        if pd.notna(row.get('generated_description')) and pd.notna(row.get('descripcion')):
             combined_examples += f"Título: {row['descripción']}\nDescripción: {row['generated_description']}\n\n"
     return combined_examples
 
@@ -98,7 +98,7 @@ if option == "URL de imagen":
             st.write(description_quechua)
             
             # Guardar la nueva descripción en el DataFrame y en el archivo CSV
-            new_df = new_df.append({"imagen": img_url, "descripción": title, "generated_description": description, "generated_description_quechua": description_quechua}, ignore_index=True)
+            new_df = new_df._append({"imagen": img_url, "descripcion": title, "generated_description": description, "generated_description_quechua": description_quechua}, ignore_index=True)
             new_df.to_csv(new_dataset_path, sep=';', index=False)
 
 else:
@@ -125,9 +125,9 @@ else:
             st.write(description_quechua)
             
             # Guardar la nueva descripción en el DataFrame y en el archivo CSV
-            new_df = new_df.append({"imagen": img_url, "descripción": title, "generated_description": description, "generated_description_quechua": description_quechua}, ignore_index=True)
+            new_df = new_df._append({"imagen": img_url, "descripcion": title, "generated_description": description, "generated_description_quechua": description_quechua}, ignore_index=True)
             new_df.to_csv(new_dataset_path, sep=';', index=False)
 
 # Mostrar el historial de descripciones generadas
 st.write("Historial de descripciones generadas:")
-st.dataframe(new_df[["imagen", "descripción", "generated_description", "generated_description_quechua"]])
+st.dataframe(new_df[["imagen", "descripcion", "generated_description", "generated_description_quechua"]])
