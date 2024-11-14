@@ -93,7 +93,7 @@ if option == "URL de imagen":
         
         # Generar descripción
         if st.button("Generar Descripción"):
-            description, description_quechua = describe_image(img_url, title, example_descriptions)
+            description = describe_image(img_url, title, example_descriptions)
             st.write("Descripción en español:")
             st.write(description)
             #st.write("Descripción en quechua:")
