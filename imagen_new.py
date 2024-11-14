@@ -96,8 +96,8 @@ if option == "URL de imagen":
             description, description_quechua = describe_image(img_url, title, example_descriptions)
             st.write("Descripción en español:")
             st.write(description)
-            st.write("Descripción en quechua:")
-            st.write(description_quechua)
+            #st.write("Descripción en quechua:")
+            #st.write(description_quechua)
             
             # Guardar la nueva descripción en el DataFrame y en el archivo CSV
             new_df = new_df._append({"imagen": img_url, "descripcion": title, "generated_description": description}, ignore_index=True)
