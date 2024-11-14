@@ -67,7 +67,7 @@ def describe_image(img_url, title, example_descriptions):
             {"role": "user", "content": translation_prompt}
         ],
         max_tokens=300,
-        temperature=0.2
+        temperature=0.5
     )
     description_quechua = response_quechua.choices[0].message.content.strip()
 
