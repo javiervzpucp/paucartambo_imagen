@@ -4,10 +4,12 @@ from dotenv import load_dotenv
 import pandas as pd
 from openai import OpenAI
 from PIL import Image
+import tempfile
+from datetime import datetime
 
 # Cargar las variables de entorno desde el archivo .env
 load_dotenv()
-openai_api_key = openai_api_key = st.secrets["OPENAI_API_KEY"]#os.getenv("OPENAI_API_KEY")
+openai_api_key = st.secrets["OPENAI_API_KEY"]
 client = OpenAI(api_key=openai_api_key)
 
 # Rutas de archivos CSV
@@ -15,23 +17,17 @@ dataset_path = "imagenes/imagenes.csv"
 new_dataset_path = "imagenes/nuevas_descripciones.csv"
 
 # Cargar o inicializar los DataFrames
-df = pd.read_csv(dataset_path, delimiter=';',encoding='ISO-8859-1')
+df = pd.read_csv(dataset_path, delimiter=';', encoding='ISO-8859-1')
 if os.path.exists(new_dataset_path):
-    new_df = pd.read_csv(new_dataset_path, delimiter=';',encoding='ISO-8859-1')
+    new_df = pd.read_csv(new_dataset_path, delimiter=';', encoding='ISO-8859-1')
 else:
-    new_df = pd.DataFrame(columns=["imagen", "descripcion", "generated_description", "generated_description_quechua"])
+    new_df = pd.DataFrame(columns=["imagen", "descripcion", "generated_description", "fecha"])
 
 # Prompt para generar descripciones concisas
 describe_system_prompt = '''
 Eres un sistema especializado en generar descripciones breves y precisas para escenas culturales y eventos andinos, especialmente de la festividad de la Mamacha Carmen en Paucartambo. Describe de manera clara y objetiva la escena principal, destacando solo los elementos visibles y relevantes sin adornos adicionales. Mantente directo y conciso.
 '''
 
-# Prompt adicional para traducción al quechua
-#translate_to_quechua_prompt = '''
-#Traduce esta descripción al Quechua Cuzqueño. Si no conoces alguna palabra, escríbela en español. También eres un sistema especializado en generar descripciones breves y precisas para escenas culturales y eventos andinos, especialmente de la festividad de la Mamacha Carmen en Paucartambo. Describe de manera clara y objetiva la escena principal, destacando solo los elementos visibles y relevantes sin adornos adicionales. Mantente directo y conciso.
-
-
-#'''
 
 def get_combined_examples(df):
     # Verificar que la columna 'generated_description' existe en el DataFrame
@@ -45,12 +41,13 @@ def get_combined_examples(df):
             combined_examples += f"Título: {row['descripcion']}\nDescripción: {row['generated_description']}\n\n"
     return combined_examples
 
+
 def describe_image(img_url, title, example_descriptions):
     # Crear el prompt que incluye ejemplos previos como contexto
     prompt = f"{describe_system_prompt}\n\n{example_descriptions}\n\nGenera una descripción para la siguiente imagen:\nTítulo: {title}"
 
     response = client.chat.completions.create(
-        model="gpt-4o-turbo",
+        model="gpt-4-turbo",
         messages=[
             {"role": "system", "content": describe_system_prompt},
             {"role": "user", "content": prompt}
@@ -58,25 +55,39 @@ def describe_image(img_url, title, example_descriptions):
         max_tokens=300,
         temperature=0.2
     )
-    description = response.choices[0].message.content.strip()
+    return response.choices[0].message.content.strip()
 
-    # Generar traducción al quechua
-    #translation_prompt = f"{translate_to_quechua_prompt}\n\n{description}"
-    #response_quechua = client.chat.completions.create(
-    #    model="gpt-4-turbo",
-    #    messages=[
-    #        {"role": "system", "content": translate_to_quechua_prompt},
-    #        {"role": "user", "content": translation_prompt}
-    #    ],
-    #    max_tokens=300,
-    #    temperature=0.2
-    #)
-    #description_quechua = response_quechua.choices[0].message.content.strip()
 
-    return description#, description_quechua
+def generate_questions_from_description(description):
+    # Genera preguntas dinámicas basadas en la descripción generada
+    questions = [
+        f"¿Qué elementos destacan en '{description[:50]}...'?",
+        f"¿Cuál es el contexto cultural de esta escena?",
+        "¿Qué simbolismo tiene esta imagen?"
+    ]
+    return questions
+
+
+def export_to_csv(dataframe):
+    # Exportar el historial como un archivo CSV descargable
+    csv = dataframe.to_csv(index=False).encode('utf-8')
+    st.download_button(
+        label="Descargar historial como CSV",
+        data=csv,
+        file_name="historial_descripciones.csv",
+        mime="text/csv",
+    )
+
 
 # Inicializar la aplicación Streamlit
 st.title("Generador de Descripciones de Imágenes de Danzas de Paucartambo")
+
+# Sidebar para mostrar historial y opciones
+with st.sidebar:
+    st.write("Opciones")
+    if st.checkbox("Mostrar historial"):
+        st.dataframe(new_df[["imagen", "descripcion", "generated_description"]])
+        export_to_csv(new_df)
 
 # Opción para ingresar una URL de imagen o cargar un archivo de imagen
 option = st.radio("Seleccione el método para proporcionar una imagen:", ("URL de imagen", "Subir imagen"))
@@ -85,51 +96,67 @@ if option == "URL de imagen":
     img_url = st.text_input("Ingrese la URL de la imagen")
     title = st.text_input("Ingrese un título o descripción breve de la imagen")
     if img_url and title:
-        # Mostrar la imagen
         st.image(img_url, caption="Imagen desde URL", use_column_width=True)
-        
-        # Obtener ejemplos combinados de descripciones previas
         example_descriptions = get_combined_examples(new_df)
-        
-        # Generar descripción
         if st.button("Generar Descripción"):
-            description = describe_image(img_url, title, example_descriptions)
-            st.write("Descripción en español:")
-            st.write(description)
-            #st.write("Descripción en quechua:")
-            #st.write(description_quechua)
-            
-            # Guardar la nueva descripción en el DataFrame y en el archivo CSV
-            new_df = new_df._append({"imagen": img_url, "descripcion": title, "generated_description": description}, ignore_index=True)
-            new_df.to_csv(new_dataset_path, sep=';', index=False,encoding='ISO-8859-1')
+            try:
+                description = describe_image(img_url, title, example_descriptions)
+                st.write("Descripción en español:")
+                st.write(description)
 
+                # Guardar la nueva descripción en el DataFrame y en el archivo CSV
+                new_row = {
+                    "imagen": img_url,
+                    "descripcion": title,
+                    "generated_description": description,
+                    "fecha": datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+                }
+                new_df = pd.concat([new_df, pd.DataFrame([new_row])], ignore_index=True)
+                new_df.to_csv(new_dataset_path, sep=';', index=False, encoding='ISO-8859-1')
+
+                # Generar preguntas dinámicas basadas en la descripción
+                dynamic_questions = generate_questions_from_description(description)
+                st.write("**Preguntas relacionadas:**")
+                for q in dynamic_questions:
+                    if st.button(q):
+                        st.write(f"Respuesta a: {q}")  # Placeholder
+            except Exception as e:
+                st.error(f"Error al generar la descripción: {e}")
 else:
     uploaded_file = st.file_uploader("Cargue una imagen", type=["jpg", "jpeg", "png"])
     title = st.text_input("Ingrese un título o descripción breve de la imagen")
-    
+
     if uploaded_file and title:
-        # Mostrar la imagen
         image = Image.open(uploaded_file)
         st.image(image, caption="Imagen cargada", use_column_width=True)
-        
-        # Guardar temporalmente la imagen y generar una URL temporal
-        img_url = f"imagen_cargada_{uploaded_file.name}"
-        
-        # Obtener ejemplos combinados de descripciones previas
-        example_descriptions = get_combined_examples(new_df)
-        
-        # Generar descripción
-        if st.button("Generar Descripción"):
-            description = describe_image(img_url, title, example_descriptions)
-            st.write("Descripción en español:")
-            st.write(description)
-            #st.write("Descripción en quechua:")
-            #st.write(description_quechua)
-            
-            # Guardar la nueva descripción en el DataFrame y en el archivo CSV
-            new_df = new_df._append({"imagen": img_url, "descripcion": title, "generated_description": description}, ignore_index=True)
-            new_df.to_csv(new_dataset_path, sep=';', index=False,encoding='ISO-8859-1')
 
-# Mostrar el historial de descripciones generadas
-st.write("Historial de descripciones generadas:")
-st.dataframe(new_df[["imagen", "descripcion", "generated_description"]])
+        # Guardar temporalmente la imagen y generar una URL temporal
+        with tempfile.NamedTemporaryFile(delete=False, suffix=".png") as temp_file:
+            temp_file.write(uploaded_file.getbuffer())
+            img_url = temp_file.name
+
+        example_descriptions = get_combined_examples(new_df)
+        if st.button("Generar Descripción"):
+            try:
+                description = describe_image(img_url, title, example_descriptions)
+                st.write("Descripción en español:")
+                st.write(description)
+
+                # Guardar la nueva descripción en el DataFrame y en el archivo CSV
+                new_row = {
+                    "imagen": img_url,
+                    "descripcion": title,
+                    "generated_description": description,
+                    "fecha": datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+                }
+                new_df = pd.concat([new_df, pd.DataFrame([new_row])], ignore_index=True)
+                new_df.to_csv(new_dataset_path, sep=';', index=False, encoding='ISO-8859-1')
+
+                # Generar preguntas dinámicas basadas en la descripción
+                dynamic_questions = generate_questions_from_description(description)
+                st.write("**Preguntas relacionadas:**")
+                for q in dynamic_questions:
+                    if st.button(q):
+                        st.write(f"Respuesta a: {q}")  # Placeholder
+            except Exception as e:
+                st.error(f"Error al generar la descripción: {e}")
