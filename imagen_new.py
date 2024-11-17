@@ -7,7 +7,7 @@ from PIL import Image
 
 # Cargar las variables de entorno desde el archivo .env
 load_dotenv()
-openai_api_key = os.getenv("OPENAI_API_KEY")
+openai_api_key = openai_api_key = st.secrets["OPENAI_API_KEY"]#os.getenv("OPENAI_API_KEY")
 client = OpenAI(api_key=openai_api_key)
 
 # Rutas de archivos CSV
@@ -50,7 +50,7 @@ def describe_image(img_url, title, example_descriptions):
     prompt = f"{describe_system_prompt}\n\n{example_descriptions}\n\nGenera una descripción para la siguiente imagen:\nTítulo: {title}"
 
     response = client.chat.completions.create(
-        model="gpt-4-turbo",
+        model="gpt-4o-turbo",
         messages=[
             {"role": "system", "content": describe_system_prompt},
             {"role": "user", "content": prompt}
